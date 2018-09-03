@@ -3,7 +3,7 @@
 //  KeyboardManager
 //
 //  Created by Kondaiah V on 9/3/18.
-//  Copyright © 2018 Kondaiah V. All rights reserved.
+//  Copyright © 2018 Veeraboyina Kondaiah. All rights reserved.
 //
 
 #import "AppDelegate.h"
@@ -20,7 +20,7 @@
     // Override point for customization after application launch.
     
     //
-    [VKKeyboardManager shared].keyboard_gap = 15.0; // optional
+    [VKKeyboardManager shared].keyboard_gap = 100.0; // optional
     [[VKKeyboardManager shared] setEnable];
     
     return YES;

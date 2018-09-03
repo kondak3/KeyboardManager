@@ -50,49 +50,11 @@
     
     // add only once...
     if (!_initialize) {
+        
         _initialize = YES;
         [self create_toolbar];
         [self add_observers];
     }
-}
-
-- (void)add_observers {
-    
-    // textfiled notifications...
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(textField_textDidBeginEditing:)
-                                                 name:UITextFieldTextDidBeginEditingNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(textField_textDidEndEditing:)
-                                                 name:UITextFieldTextDidEndEditingNotification object:nil];
-    // textview notifications...
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(textView_textDidBeginEditing:)
-                                                 name:UITextViewTextDidBeginEditingNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(textView_textDidEndEditing:)
-                                                 name:UITextViewTextDidEndEditingNotification object:nil];
-    
-    // keyboard notifications...
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillShow:)
-                                                 name:UIKeyboardWillShowNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(keyboardWillHide:)
-                                                 name:UIKeyboardWillHideNotification object:nil];
-}
-
-- (void)dealloc {
-    
-    // dealloc all notifications...
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidBeginEditingNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidBeginEditingNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidBeginEditingNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidBeginEditingNotification object:nil];
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidBeginEditingNotification object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:UITextFieldTextDidBeginEditingNotification object:nil];
 }
 
 #pragma mark -
@@ -159,6 +121,7 @@
         // move to next responder...
         responder = [responder nextResponder];
         if ([responder isKindOfClass:[UIViewController class]]) {
+            
             // getting final controller...
             return (UIViewController *)responder;
         }
@@ -173,6 +136,63 @@
         return [self getController:_textField];
     else
         return [self getController:_textView];
+}
+
+- (void)add_observers {
+    
+    // textfiled notifications...
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(textField_textDidBeginEditing:)
+                                                 name:UITextFieldTextDidBeginEditingNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(textField_textDidEndEditing:)
+                                                 name:UITextFieldTextDidEndEditingNotification
+                                               object:nil];
+    // textview notifications...
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(textView_textDidBeginEditing:)
+                                                 name:UITextViewTextDidBeginEditingNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(textView_textDidEndEditing:)
+                                                 name:UITextViewTextDidEndEditingNotification
+                                               object:nil];
+    
+    // keyboard notifications...
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillShow:)
+                                                 name:UIKeyboardWillShowNotification
+                                               object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(keyboardWillHide:)
+                                                 name:UIKeyboardWillHideNotification
+                                               object:nil];
+}
+
+- (void)dealloc {
+    
+    // dealloc all notifications...
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                  object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                  object:nil];
+    
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                  object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                  object:nil];
 }
 
 #pragma mark -
@@ -191,7 +211,11 @@
         return;
     }
     
-    float yValue = fieldRect.size.height + fieldRect.origin.y + self.keyboard_gap;
+    // default height...
+    if (_keyboard_gap <= 5.0 || _keyboard_gap >= 101.0) {
+        _keyboard_gap = 5.0;
+    }
+    float yValue = fieldRect.size.height + fieldRect.origin.y + _keyboard_gap;
     
     // screen height calculations...
     CGRect screenSize = [UIScreen mainScreen].bounds;
