@@ -10,7 +10,7 @@ Automatic Reference Counting (ARC)
 ## Usage:
 - Drag and drop "VKKeyboardManager" folder into your resource
 
-- Import "VKKeyboardManger" into "AppDelegate.h"
+- Import "VKKeyboardManger.h" in "AppDelegate.h" file
 
 // add this code in "AppDelegate.m" didFinishLaunchingWithOptions method...
 
