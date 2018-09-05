@@ -20,7 +20,7 @@
     // Override point for customization after application launch.
     
     //
-    [VKKeyboardManager shared].keyboard_gap = 100.0; // optional
+    [VKKeyboardManager shared].keyboard_gap = 10.0; // optional
     [[VKKeyboardManager shared] setEnable];
     
     return YES;

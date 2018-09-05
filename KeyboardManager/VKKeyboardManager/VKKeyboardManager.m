@@ -23,6 +23,7 @@
     UITextField *_textField;
     // textview for assign...
     UITextView *_textView;
+
 }
 @end
 
@@ -177,21 +178,21 @@
                                                     name:UITextFieldTextDidBeginEditingNotification
                                                   object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                    name:UITextFieldTextDidEndEditingNotification
                                                   object:nil];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                    name:UITextViewTextDidBeginEditingNotification
                                                   object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                    name:UITextViewTextDidEndEditingNotification
                                                   object:nil];
     
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                    name:UIKeyboardWillShowNotification
                                                   object:nil];
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:UITextFieldTextDidBeginEditingNotification
+                                                    name:UIKeyboardWillHideNotification
                                                   object:nil];
 }
 
@@ -205,25 +206,26 @@
         fieldRect = [_window convertRect:_textField.bounds fromView:_textField];
     }
     else if (_textView != nil) {
-        fieldRect = [_window convertRect:_textField.bounds fromView:_textField];
+        fieldRect = [_window convertRect:_textView.bounds fromView:_textView];
     }
     else {
+        [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
         return;
     }
-    
+
     // default height...
     if (_keyboard_gap <= 5.0 || _keyboard_gap >= 101.0) {
         _keyboard_gap = 5.0;
     }
     float yValue = fieldRect.size.height + fieldRect.origin.y + _keyboard_gap;
-    
+
     // screen height calculations...
     CGRect screenSize = [UIScreen mainScreen].bounds;
     float height = screenSize.size.height - yValue;
     if (height < 0) {
         height = 0;
     }
-    
+
     // if we didn't get view controller...
     UIViewController *viewCtrl = [self getController];
     if (viewCtrl == nil) {
@@ -233,19 +235,19 @@
     // Keyboard height....
     NSDictionary *userInfo = notification.userInfo;
     CGSize kbSize = [[userInfo objectForKey:UIKeyboardFrameEndUserInfoKey] CGRectValue].size;
-    float upperVal = -kbSize.height+height;
-    
+    float upperVal = -kbSize.height + height;
+
     // getting view controller "self" view
     UIView *mainView = viewCtrl.view;
     if (height < kbSize.height) {
-        
+
         // view move to up...
         [UIView animateWithDuration:0.5 animations:^{
             mainView.frame = CGRectMake(0, upperVal, mainView.frame.size.width, mainView.frame.size.height);
         }];
     }
     else {
-        
+
         // view move to down...
         [UIView animateWithDuration:0.5 animations:^{
             mainView.frame = CGRectMake(0, 0, mainView.frame.size.width, mainView.frame.size.height);
@@ -299,6 +301,7 @@
         
         _textView = (UITextView *)notification.object;
         [self add_toolbar];
+        [_textView becomeFirstResponder];
     }
 }
 
