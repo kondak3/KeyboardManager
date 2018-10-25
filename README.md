@@ -2,9 +2,9 @@
 
 ## Requirements:
 
-iOS 7 or higher
+- iOS 7 or higher
 
-Automatic Reference Counting (ARC)
+- Automatic Reference Counting (ARC)
 
 
 ## Usage:
@@ -12,9 +12,8 @@ Automatic Reference Counting (ARC)
 
 - Import "VKKeyboardManger.h" in "AppDelegate.h" file
 
-// add this code in "AppDelegate.m" didFinishLaunchingWithOptions method...
-
 ```
+// add this code in "AppDelegate.m" didFinishLaunchingWithOptions method...
 [[VKKeyboardManager shared] setEnable];
 [VKKeyboardManager shared].keyboard_gap = 5.0; // default vaule 5.0 and max 100.0
 ```
