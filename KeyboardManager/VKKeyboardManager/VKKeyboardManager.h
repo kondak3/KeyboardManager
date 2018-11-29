@@ -20,5 +20,6 @@
 
 // enable keyboard manager...
 - (void)setEnable;
+- (void)setDisable;
 
 @end

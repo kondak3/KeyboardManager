@@ -8,7 +8,7 @@
 
 #import "VKKeyboardManager.h"
 
-#define tool_height 35
+#define tool_height 40
 @interface VKKeyboardManager () {
     
     // variables...
@@ -17,12 +17,12 @@
     UILabel *_placeholder;
     // toolbar...
     UIToolbar *_toolBar;
-    // done button for keyboard resign...
-    UIButton *_doneBtn;
     // textfiled for assign..
     UITextField *_textField;
     // textview for assign...
     UITextView *_textView;
+	// disable...
+	BOOL _disable;
 
 }
 @end
@@ -48,6 +48,7 @@
     if (_keyboard_gap == 0) {
         _keyboard_gap = 5.0;
     }
+	_disable = NO;
     
     // add only once...
     if (!_initialize) {
@@ -58,49 +59,58 @@
     }
 }
 
+// keyboard manager disable...
+- (void)setDisable {
+	_disable = YES;
+}
+
 #pragma mark -
 - (void)create_toolbar {
-    
-    // parent view creations...
-    UIView *parent_view = [[UIView alloc] initWithFrame:CGRectMake(0, 0, ([UIScreen mainScreen].bounds.size.width - 40), tool_height)];
-    parent_view.backgroundColor = [UIColor clearColor];
-
+	
     // done buttons...
-    _doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
-    _doneBtn.frame = CGRectMake((parent_view.frame.size.width - 50), 0, 50, tool_height);
+    UIButton *_doneBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    _doneBtn.frame = CGRectMake(0, 0, 50, tool_height);
     _doneBtn.backgroundColor = [UIColor clearColor];
     _doneBtn.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
     [_doneBtn setTitle:@"Done" forState:UIControlStateNormal];
     [_doneBtn setTitleColor:[UIColor colorWithRed:30.0/255.0 green:150.0/255.0 blue:255.0/255.0 alpha:1.0] forState:UIControlStateNormal];
     _doneBtn.titleLabel.font = [UIFont systemFontOfSize:15];
     [_doneBtn addTarget:self action:@selector(dismissKeyboard) forControlEvents:UIControlEventTouchUpInside];
-    [parent_view addSubview:_doneBtn];
 
+	
+	UIView *_emptyView = [[UIView alloc] init];
+	_emptyView.frame = CGRectMake(0, 0, 50, tool_height);
+	_emptyView.backgroundColor = [UIColor clearColor];
+	
+	
     // place holder label...
-    _placeholder = [[UILabel alloc] initWithFrame:CGRectMake(115/2, 0, (parent_view.frame.size.width - 115), tool_height)];
+    _placeholder = [[UILabel alloc] initWithFrame:CGRectMake(0, 0, 180, tool_height)];
     _placeholder.textColor = [UIColor grayColor];
     _placeholder.textAlignment = NSTextAlignmentCenter;
     _placeholder.numberOfLines = 2;
     _placeholder.minimumScaleFactor = 8;
     _placeholder.font = [UIFont systemFontOfSize:12];
     _placeholder.backgroundColor = [UIColor clearColor];
-    [parent_view addSubview:_placeholder];
-    
+	
+	
     // tool bar creation...
-    UIBarButtonItem *button_items = [[UIBarButtonItem alloc] initWithCustomView:parent_view];
+	UIBarButtonItem *space_area = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemFlexibleSpace
+																				target:nil action:nil];
     _toolBar = [[UIToolbar alloc] initWithFrame:CGRectMake(0, 0, 320, 50)];
-    _toolBar.items = @[button_items];
+	_toolBar.items = @[[[UIBarButtonItem alloc] initWithCustomView:_emptyView], space_area,
+					   [[UIBarButtonItem alloc] initWithCustomView:_placeholder], space_area,
+					   [[UIBarButtonItem alloc] initWithCustomView:_doneBtn]];
     [_toolBar sizeToFit];
 }
 
-
 - (void)add_toolbar {
-    
-    // tool bar width....
-    float final_width = ([UIScreen mainScreen].bounds.size.width - 40);
-    _doneBtn.frame = CGRectMake((final_width - 50), 0, 50, tool_height);
-    _placeholder.frame = CGRectMake(115/2, 0, (final_width - 115), tool_height);
-    
+	
+	// keyboard disable...
+	if (_disable == YES) {
+		return;
+	}
+	[self frame_adjustment];
+
     // assign tool bar to textfiled/textview...
     if (_textField != nil) {
         
@@ -169,6 +179,11 @@
                                              selector:@selector(keyboardWillHide:)
                                                  name:UIKeyboardWillHideNotification
                                                object:nil];
+	// orientation notifications...
+	[[NSNotificationCenter defaultCenter] addObserver: self
+											 selector: @selector(deviceOrientationDidChange:)
+												 name: UIDeviceOrientationDidChangeNotification
+											   object: nil];
 }
 
 - (void)dealloc {
@@ -194,12 +209,49 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:UIKeyboardWillHideNotification
                                                   object:nil];
+	
+	[[NSNotificationCenter defaultCenter] removeObserver:self
+													name:UIDeviceOrientationDidChangeNotification
+												  object:nil];
+}
+
+#pragma mark -
+- (void)deviceOrientationDidChange:(NSNotification *)notification {
+	[self dismissKeyboard];
+}
+
+- (void)frame_adjustment {
+	
+	if (_placeholder != nil) {
+		
+		// orientation checking...
+		UIInterfaceOrientation interfaceOrientation = [[UIApplication sharedApplication] statusBarOrientation];
+		if (UIInterfaceOrientationIsPortrait(interfaceOrientation)) {
+			_placeholder.frame = CGRectMake(0, 0, ([UIScreen mainScreen].bounds.size.width - 140), tool_height);
+		} else {
+			_placeholder.frame = CGRectMake(0, 0, ([UIScreen mainScreen].bounds.size.width - 280), tool_height);
+		}
+		
+		// adjustment menu...
+		if (_toolBar.items.count >= 3) {
+			
+			NSMutableArray *temp_array = [_toolBar.items mutableCopy];
+			[temp_array replaceObjectAtIndex:2 withObject:[[UIBarButtonItem alloc] initWithCustomView:_placeholder]];
+			_toolBar.items = temp_array;
+			[_toolBar sizeToFit];
+		}
+	}
 }
 
 #pragma mark -
 - (void)keyboardWillShow:(NSNotification *)notification {
     
-    // getting textfield y-axis...
+	// keyboard disable...
+	if (_disable == YES) {
+		return;
+	}
+	
+	// getting textfield y-axis...
     UIWindow *_window = UIApplication.sharedApplication.keyWindow;
     CGRect fieldRect;
     if (_textField != nil) {
@@ -257,7 +309,12 @@
 
 - (void)keyboardWillHide:(NSNotification *)notification {
     
-    // if we didn't get view controller...
+	// keyboard disable...
+	if (_disable == YES) {
+		return;
+	}
+	
+	// if we didn't get view controller...
     UIViewController *viewCtrl = [self getController];
     if (viewCtrl == nil) {
         return;
