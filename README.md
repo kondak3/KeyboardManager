@@ -19,12 +19,12 @@
 ```
 
 ```
-// if any screen you don't want this disable it
+// if any screen you don't want this disable this
 [[VKKeyboardManager shared] setDisable];
 ```
 
 ```
-// move to back or next again 
+// move to back or next again enable this
 [[VKKeyboardManager shared] setEnable];
 
 ```
